@@ -1,0 +1,7 @@
+{
+  "name": "PowerHourr",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
