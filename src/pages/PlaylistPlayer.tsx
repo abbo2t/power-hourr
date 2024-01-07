@@ -9,8 +9,9 @@ import YouTube, { YouTubeProps } from "react-youtube";
 import ExploreContainer from "../components/ExploreContainer";
 import "./PlaylistPlayer.css";
 import { useEffect, useState, useRef } from "react";
+import { Storage } from '@ionic/storage';
 
-const playList = [
+let playList = [
   {
     videoId: "dBK0gKW61NU",
     start: 222,
@@ -33,35 +34,71 @@ const playList = [
   },
 ];
 
+const fetchThePlaylist = async () => {
+  const store = new Storage();
+  await store.create();
+
+  let fetchedPlaylist = await store.get('playlist');
+  return fetchedPlaylist;
+};
+
 const PlaylistPlayer: React.FC = () => {
   const effectRan = useRef(false);
   const debouncing = useRef(false);
   const currentId = useRef(0);
   //const videoId = useRef(playList[currentId.current].videoId);
   const [videoId, setVideoId] = useState('AjWfY7SnMBI');
-  const opts = useRef<YouTubeProps["opts"]>({
-    height: "390",
-    width: "640",
-    playerVars: {
-      // https://developers.google.com/youtube/player_parameters
-      autoplay: 1,
-      start: playList[currentId.current].start,
-      end: playList[currentId.current].end,
-      controls: 0,
-      iv_load_policy: 3,
-      rel: 0
-    },
-  });
+  let opts = useRef({});
 
   useEffect(() => {
-    if (!effectRan.current) {
-      console.log("effect applied - only on the FIRST mount");
-    }
+    
+    if (true || !effectRan.current) {
 
-    setTimeout(() => {
-      //setVideoId(playList[currentId.current].videoId)
-    }, 1000);
-    //videoPlay({data: YouTube.PlayerState.ENDED});
+       // declare the data fetching function
+      const fetchData = async () => {
+        let thePlaylist = await fetchThePlaylist();
+        if(thePlaylist) {
+          playList = thePlaylist;
+          console.log('the playlist: ', thePlaylist);
+          // opts.current = {
+          //   height: "390",
+          //   width: "640",
+          //   playerVars: {
+          //     // https://developers.google.com/youtube/player_parameters
+          //     autoplay: 1,
+          //     start: playList[currentId.current].start,
+          //     end: playList[currentId.current].end,
+          //     controls: 0,
+          //     iv_load_policy: 3,
+          //     rel: 0
+          //   },
+          // };
+        }
+        opts.current = {
+          height: "390",
+          width: "640",
+          playerVars: {
+            // https://developers.google.com/youtube/player_parameters
+            autoplay: 1,
+            start: playList[currentId.current].start,
+            end: playList[currentId.current].end,
+            controls: 0,
+            iv_load_policy: 3,
+            rel: 0
+          },
+        };
+      }
+
+      // call the function
+      fetchData()
+        // make sure to catch any error
+        .catch(console.error);
+
+        
+
+      console.log("effect applied - only on the FIRST mount");
+      
+    }
 
     return () => {
       effectRan.current = true;
@@ -73,6 +110,8 @@ const PlaylistPlayer: React.FC = () => {
     console.log("onPlayerReady is called!");
     //console.log(event.target)
     //event.target.playVideo();
+    //let thePlaylist = await fetchThePlaylist();
+    //console.log(thePlaylist);
   };
 
   const videoPlay = (event: any) => {

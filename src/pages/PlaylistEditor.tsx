@@ -10,29 +10,7 @@ import YouTube, { YouTubeProps } from "react-youtube";
 import ExploreContainer from "../components/ExploreContainer";
 import "./PlaylistEditor.css";
 import { useEffect, useState, useRef } from "react";
-
-const playList = [
-  {
-    videoId: "dBK0gKW61NU",
-    start: 222,
-    end: 224,
-  },
-  {
-    videoId: "LtCfuHLrixY",
-    start: 210,
-    end: 213,
-  },
-  {
-    videoId: "pU_nCvEq_Y4",
-    start: 18526,
-    end: 18529,
-  },
-  {
-    videoId: "EHpxi7khHb0",
-    start: 3008,
-    end: 3010,
-  },
-];
+import { Storage } from '@ionic/storage';
 
 const PlaylistEditor: React.FC = () => {
   const effectHasRun = useRef(false);
@@ -54,10 +32,28 @@ const PlaylistEditor: React.FC = () => {
     },
   });
 
-  const onMyPlayerReady: YouTubeProps["onReady"] = (event) => {
+  const storeMyPlaylist = async (playlist: any) => {
+    const store = new Storage();
+    await store.create();
+
+    await store.set('playlist', [{
+        videoId: playlist[0],
+        start: 1,
+        end: 5
+    },
+    {
+        videoId: playlist[1],
+        start: 1,
+        end: 5
+    }]);
+  };
+
+  const onMyPlayerReady: YouTubeProps["onReady"] = async (event) => {
     // access to player in all event handlers via event.target
     console.log("onPlayerReady is called!");
-    console.log(event.target.getPlaylist())
+    const myPlaylist = event.target.getPlaylist();
+    console.log(myPlaylist);
+    await storeMyPlaylist(myPlaylist);
   };
 
   return (
