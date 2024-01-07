@@ -36,16 +36,26 @@ const PlaylistLoader: React.FC = () => {
     const store = new Storage();
     await store.create();
 
-    await store.set('playlist', [{
-        videoId: playlist[0],
+    // await store.set('playlist', [{
+    //     videoId: playlist[0],
+    //     start: 50,
+    //     end: 60
+    // },
+    // {
+    //     videoId: playlist[1],
+    //     start: 31,
+    //     end: 35
+    // }]);
+
+    // @ts-ignore
+    await store.set('playlist', playlist.map((item, index) => {
+      return {
+        videoId: item,
         start: 1,
-        end: 5
-    },
-    {
-        videoId: playlist[1],
-        start: 31,
-        end: 35
-    }]);
+        end: 61
+
+      }
+    }));
   };
 
   const onMyPlayerReady: YouTubeProps["onReady"] = async (event) => {
