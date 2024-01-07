@@ -14,7 +14,7 @@ import { listOutline, libraryOutline, personOutline } from 'ionicons/icons';
 import Tab1 from './pages/Tab1';
 import Tab2 from './pages/Tab2';
 import Tab3 from './pages/Tab3';
-import PlaylistEditor from './pages/PlaylistEditor';
+import PlaylistLoader from './pages/PlaylistLoader';
 import PlaylistPlayer from './pages/PlaylistPlayer';
 
 /* Core CSS required for Ionic components to work properly */
@@ -35,6 +35,7 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import PlaylistEditor from "./pages/PlaylistEditor";
 
 setupIonicReact();
 
@@ -54,6 +55,9 @@ const App: React.FC = () => (
           </Route>
           <Route path="/play/:id">
             <PlaylistPlayer />
+          </Route>
+          <Route path="/loader/:id">
+            <PlaylistLoader />
           </Route>
           <Route path="/editor/:id">
             <PlaylistEditor />

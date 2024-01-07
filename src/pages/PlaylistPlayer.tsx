@@ -142,6 +142,7 @@ const PlaylistPlayer: React.FC = () => {
         opts.current = {
           ...opts.current,
           playerVars: {
+            // @ts-ignore
             ...opts.current.playerVars,
             start: playList[currentId.current].start,
             end: playList[currentId.current].end,
