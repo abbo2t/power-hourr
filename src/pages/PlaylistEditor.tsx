@@ -1,11 +1,12 @@
 import {
-  IonButton,
   IonCol,
   IonContent, IonGrid,
   IonHeader, IonItem, IonLabel,
   IonPage, IonRange, IonRow,
   IonTitle,
   IonToolbar,
+  IonAccordion,
+  IonAccordionGroup, IonInput
 } from "@ionic/react";
 import YouTube, {YouTubeProps} from "react-youtube";
 import ExploreContainer from "../components/ExploreContainer";
@@ -18,11 +19,19 @@ const PlaylistEditor: React.FC = () => {
     const currentId = useRef(0);
     const currentLength = useRef(100);
     const currentRange = useRef({lower: 0, upper: 0});
+    const accordionGroup = useRef<null | HTMLIonAccordionGroupElement>(null);
     const [playList, setPlayList] = useState<any[]>([]);
     //const [opts, setOpts] = useState({});
     const opts = useRef({});
     //const videoId = useRef(playList[currentId.current].videoId);
     const [videoId, setVideoId] = useState('');
+    const [interstitial, setInterstitial] = useState({
+      end: 0,
+      length: 0,
+      start: 0,
+      title: '',
+      videoId: ''
+    });
 
     useEffect(() => {
       if (!effectRan.current) {
@@ -53,6 +62,8 @@ const PlaylistEditor: React.FC = () => {
 
       fetchDataInUseEffect().catch(console.error);
 
+      toggleAccordion();
+
       return () => {
         effectRan.current = true;
       };
@@ -62,15 +73,37 @@ const PlaylistEditor: React.FC = () => {
       // access to player in all event handlers via event.target
       console.log("onPlayerReady is called!", currentId.current, event.target);
       if ('24 hours + of pure black screen in HD!' !== event.target.videoTitle && '' !== event.target.videoTitle) {
-        const updatedPlayList = playList.map((item, ix) => {
-          return ix === currentId.current ? {
-            ...playList[ix],
+        if (videoId === interstitial.videoId) {
+          setInterstitial({
+            ...interstitial,
             title: event.target.videoTitle,
             length: Math.floor(event.target.getDuration())
-          } : {...playList[ix]};
-        })
-        setPlayList(updatedPlayList);
-        storePhlist(updatedPlayList).catch(console.error);
+          });
+          // todo: storeInterstitial ...
+        } else {
+          const updatedPlayList = playList.map((item, ix) => {
+            return ix === currentId.current ? {
+              ...playList[ix],
+              title: event.target.videoTitle,
+              length: Math.floor(event.target.getDuration())
+            } : {...playList[ix]};
+          })
+          setPlayList(updatedPlayList);
+          storePhlist(updatedPlayList).catch(console.error);
+        }
+      }
+    };
+
+    const toggleAccordion = () => {
+      if (!accordionGroup.current) {
+        return;
+      }
+      const nativeEl = accordionGroup.current;
+
+      if (nativeEl.value === 'first') {
+        nativeEl.value = undefined;
+      } else {
+        nativeEl.value = 'first';
       }
     };
 
@@ -92,24 +125,67 @@ const PlaylistEditor: React.FC = () => {
             <IonGrid>
               <IonRow>
                 <IonCol size="12" size-sm="6">
-                  {playList.map((d: any, ix) => (
-                    <IonItem button key={d.videoId} onClick={() => {
-                      currentId.current = ix;
-                      currentLength.current = getLengthOfVideo(d);
-                      opts.current = {
-                        ...opts,
-                        playerVars: {
-                          // @ts-ignore
-                          ...opts.playerVars,
-                          autoplay: 1,
-                          controls: 0,
-                          start: playList[currentId.current].start,
-                          end: playList[currentId.current].end,
-                        },
-                      };
-                      setVideoId(d.videoId);
-                    }}><IonLabel>{d.title ? d.title : `Video #${1 + ix}`}</IonLabel></IonItem>
-                  ))}
+                  <IonAccordionGroup ref={accordionGroup} multiple={false}>
+                    <IonAccordion value="first">
+                      <IonItem slot="header">
+                        Playlist
+                      </IonItem>
+                      <div slot="content">
+                        {playList.map((d: any, ix) => (
+                          <IonItem button key={d.videoId} onClick={() => {
+                            currentId.current = ix;
+                            currentLength.current = getLengthOfVideo(d);
+                            opts.current = {
+                              ...opts,
+                              playerVars: {
+                                // @ts-ignore
+                                ...opts.playerVars,
+                                autoplay: 1,
+                                controls: 0,
+                                start: playList[currentId.current].start,
+                                end: playList[currentId.current].end,
+                              },
+                            };
+                            setVideoId(d.videoId);
+                          }}><IonLabel>{d.title ? d.title : `Video #${1 + ix}`}</IonLabel></IonItem>
+                        ))}
+                      </div>
+                    </IonAccordion>
+                    <IonAccordion value="second">
+                      <IonItem slot="header">
+                        Interstitial
+                      </IonItem>
+                      <div slot="content">
+                        <IonItem button key={'interstitial'} onClick={() => {
+                          //currentId.current = ix;
+                          currentLength.current = getLengthOfVideo(interstitial);
+                          opts.current = {
+                            ...opts,
+                            playerVars: {
+                              // @ts-ignore
+                              ...opts.playerVars,
+                              autoplay: 1,
+                              controls: 0,
+                              start: interstitial.start,
+                              end: interstitial.end,
+                            },
+                          };
+                          setVideoId(interstitial.videoId);
+                        }}>
+                          <IonLabel>{interstitial.title ? interstitial.title : '--'}</IonLabel>
+                        </IonItem>
+                        <IonItem>
+                          <IonInput label="VideoID" type="text" placeholder="e.g., dQw4w9WgXcQ" value={interstitial.videoId} onIonInput={(ev: Event) => {
+                            const value = (ev.target as HTMLIonInputElement).value as string;
+                            setInterstitial({
+                              ...interstitial,
+                              videoId: value
+                            });
+                          }}></IonInput>
+                        </IonItem>
+                      </div>
+                    </IonAccordion>
+                  </IonAccordionGroup>
                 </IonCol>
                 <IonCol size="12" size-sm="6">
                   <YouTube
@@ -117,6 +193,7 @@ const PlaylistEditor: React.FC = () => {
                     opts={opts.current}
                     onReady={onPlayerReady}
                   />
+                  {videoId !== interstitial.videoId ? (
                   <IonRange
                     aria-label="Dual Knobs Range"
                     dualKnobs={true}
@@ -191,6 +268,20 @@ const PlaylistEditor: React.FC = () => {
                       upper: playList[currentId.current] ? playList[currentId.current].end : 0,
                     }}
                   ></IonRange>
+                    ) : (
+                    <IonRange
+                      aria-label="Dual Knob Range"
+                      dualKnobs={true}
+                      disabled={'AjWfY7SnMBI' === videoId || '' === videoId}
+                      min={0}
+                      max={currentLength.current}
+                      value={{lower: 2, upper: 5}}
+                      onIonChange={({detail}) => {
+                        console.log('Interstitial range change.')
+                    }}>
+                    </IonRange>
+                  )
+                  }
                   <p>Copyright</p>
                   <p>&copy; 2024</p>
                 </IonCol>
