@@ -9,34 +9,9 @@ import {
 } from "@ionic/react";
 import YouTube, {YouTubeProps} from "react-youtube";
 import ExploreContainer from "../components/ExploreContainer";
-import "./PlaylistPlayer.css";
+import "./PlaylistEditor.css";
 import {useEffect, useState, useRef} from "react";
-import {Storage} from '@ionic/storage';
-
-const storePhlist = async (phlist: any) => {
-  console.log('STORING PHLIST');
-  const store = new Storage();
-  await store.create();
-  console.log(phlist);
-  await store.set('playlist', phlist);
-  console.log('==============');
-};
-
-const fetchThePlaylist = async () => {
-  console.log('FETCHING PHLIST');
-  const store = new Storage();
-  await store.create();
-  let fetchedPlaylist = await store.get('playlist');
-  console.log(fetchedPlaylist);
-  console.log('==============');
-  return fetchedPlaylist;
-};
-
-const getLengthOfVideo = (video: any) => {
-  return video && video.length
-    ? Math.floor(video.length)
-    : 100
-};
+import {storePhlist, fetchPhlist, getLengthOfVideo} from "../utilities";
 
 const PlaylistEditor: React.FC = () => {
     const effectRan = useRef(false);
@@ -55,7 +30,7 @@ const PlaylistEditor: React.FC = () => {
       }
 
       const fetchDataInUseEffect = async () => {
-        let thePlaylist = await fetchThePlaylist();
+        let thePlaylist = await fetchPhlist();
         if (thePlaylist) {
           setPlayList(thePlaylist);
         }
@@ -116,7 +91,7 @@ const PlaylistEditor: React.FC = () => {
             <h2>Edit your playlist</h2>
             <IonGrid>
               <IonRow>
-                <IonCol>
+                <IonCol size="12" size-sm="6">
                   {playList.map((d: any, ix) => (
                     <IonItem button key={d.videoId} onClick={() => {
                       currentId.current = ix;
@@ -136,7 +111,7 @@ const PlaylistEditor: React.FC = () => {
                     }}><IonLabel>{d.title ? d.title : `Video #${1 + ix}`}</IonLabel></IonItem>
                   ))}
                 </IonCol>
-                <IonCol>
+                <IonCol size="12" size-sm="6">
                   <YouTube
                     videoId={videoId}
                     opts={opts.current}
@@ -166,8 +141,12 @@ const PlaylistEditor: React.FC = () => {
                                 start: detail.value.lower,
                                 // @ts-ignore
                                 end: detail.value.upper,
+                                // @ts-ignore
+                                //end: detail.value.lower + 60,
                               },
                             };
+                            // @ts-ignore
+                            currentRange.current.upper = detail.value.lower + 60;
                             // @ts-ignore
                             currentRange.current.lower = detail.value.lower;
                             // @ts-ignore
@@ -187,15 +166,17 @@ const PlaylistEditor: React.FC = () => {
                             };
                             // @ts-ignore
                             currentRange.current.upper = detail.value.upper;
+                            // @ts-ignore
+                            currentRange.current.lower = detail.value.upper - 60;
                           }
 
                           const updatedPlayList = playList.map((item, ix) => {
                             return ix === currentId.current ? {
                               ...playList[ix],
                               // @ts-ignore
-                              start: detail.value.lower,
+                              start: currentRange.current.lower,
                               // @ts-ignore
-                              end: detail.value.upper
+                              end: currentRange.current.upper
                               // @ts-ignore
                               //end: detail.value.lower + 60
                             } : {...playList[ix]};
@@ -203,16 +184,6 @@ const PlaylistEditor: React.FC = () => {
                           setPlayList(updatedPlayList);
                           storePhlist(updatedPlayList).catch(console.error);
                         }
-                      }
-                    }
-                    onIonKnobMoveStart={
-                      ({detail}) => {
-                        console.log('ionKnobMoveStart:', detail.value)
-                      }
-                    }
-                    onIonKnobMoveEnd={
-                      ({detail}) => {
-                        console.log('ionKnobMoveEnd:', detail.value)
                       }
                     }
                     value={{
