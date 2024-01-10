@@ -146,7 +146,7 @@ const PlaylistEditor: React.FC = () => {
                               },
                             };
                             // @ts-ignore
-                            currentRange.current.upper = detail.value.lower + 60;
+                            currentRange.current.upper = Math.min(detail.value.lower + 60, getLengthOfVideo(playList[currentId.current]));
                             // @ts-ignore
                             currentRange.current.lower = detail.value.lower;
                             // @ts-ignore
@@ -167,7 +167,7 @@ const PlaylistEditor: React.FC = () => {
                             // @ts-ignore
                             currentRange.current.upper = detail.value.upper;
                             // @ts-ignore
-                            currentRange.current.lower = detail.value.upper - 60;
+                            currentRange.current.lower = Math.max(0, detail.value.upper - 60);
                           }
 
                           const updatedPlayList = playList.map((item, ix) => {
