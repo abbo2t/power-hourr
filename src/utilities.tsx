@@ -19,6 +19,25 @@ export const fetchPhlist = async () => {
     return fetchedPlaylist;
 };
 
+export const storeInterstitial = async (interstitial: any) => {
+    console.log('STORING INTERSTITIAL');
+    const store = new Storage();
+    await store.create();
+    console.log(interstitial);
+    await store.set('interstitial', interstitial);
+    console.log('==============');
+};
+
+export const fetchInterstitial = async () => {
+    console.log('FETCHING INTERSTITIAL');
+    const store = new Storage();
+    await store.create();
+    let fetchedInterstitial = await store.get('interstitial');
+    console.log(fetchedInterstitial);
+    console.log('==============');
+    return fetchedInterstitial;
+};
+
 export const getLengthOfVideo = (video: any) => {
     return video && video.length
         ? Math.floor(video.length)
