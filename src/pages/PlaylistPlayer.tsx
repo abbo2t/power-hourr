@@ -1,104 +1,62 @@
 import {
+  IonButton,
   IonContent,
   IonHeader,
   IonPage,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import YouTube, { YouTubeProps } from "react-youtube";
+import YouTube, {YouTubeProps} from "react-youtube";
 import ExploreContainer from "../components/ExploreContainer";
 import "./PlaylistPlayer.css";
-import { useEffect, useState, useRef } from "react";
-import { Storage } from '@ionic/storage';
+import {useEffect, useState, useRef} from "react";
+import {fetchPhlist, fetchInterstitial} from "../utilities";
 
-let playList = [
-  {
-    videoId: "dBK0gKW61NU",
-    start: 222,
-    end: 224,
-  },
-  {
-    videoId: "LtCfuHLrixY",
-    start: 210,
-    end: 213,
-  },
-  {
-    videoId: "pU_nCvEq_Y4",
-    start: 18526,
-    end: 18529,
-  },
-  {
-    videoId: "EHpxi7khHb0",
-    start: 3008,
-    end: 3010,
-  },
-];
-
-const fetchThePlaylist = async () => {
-  const store = new Storage();
-  await store.create();
-
-  let fetchedPlaylist = await store.get('playlist');
-  return fetchedPlaylist;
-};
+const interleave = (arr:any[], x: any) => arr.flatMap(e => [e, x]).slice(0, -1);
 
 const PlaylistPlayer: React.FC = () => {
   const effectRan = useRef(false);
   const debouncing = useRef(false);
   const currentId = useRef(0);
-  //const videoId = useRef(playList[currentId.current].videoId);
   const [videoId, setVideoId] = useState('AjWfY7SnMBI');
+  const [playList, setPlayList] = useState<any[]>([]);
   let opts = useRef({});
 
   useEffect(() => {
-    
-    if (true || !effectRan.current) {
 
-       // declare the data fetching function
-      const fetchData = async () => {
-        let thePlaylist = await fetchThePlaylist();
-        if(thePlaylist) {
-          playList = thePlaylist;
-          console.log('the playlist: ', thePlaylist);
-          // opts.current = {
-          //   height: "390",
-          //   width: "640",
-          //   playerVars: {
-          //     // https://developers.google.com/youtube/player_parameters
-          //     autoplay: 1,
-          //     start: playList[currentId.current].start,
-          //     end: playList[currentId.current].end,
-          //     controls: 0,
-          //     iv_load_policy: 3,
-          //     rel: 0
-          //   },
-          // };
+    if (!effectRan.current) {
+      console.log("effect applied - only on the FIRST mount");
+    }
+
+    // declare the data fetching function
+    const fetchDataInUseEffect = async () => {
+      let theInterstitial = await fetchInterstitial();
+      let thePlaylist = await fetchPhlist();
+      if (thePlaylist) {
+        if(theInterstitial) {
+          setPlayList(interleave(thePlaylist, theInterstitial));
+        } else {
+          setPlayList(thePlaylist);
         }
-        opts.current = {
-          height: "390",
-          width: "640",
-          playerVars: {
-            // https://developers.google.com/youtube/player_parameters
-            autoplay: 1,
-            start: playList[currentId.current].start,
-            end: playList[currentId.current].end,
-            controls: 0,
-            iv_load_policy: 3,
-            rel: 0
-          },
-        };
       }
 
-      // call the function
-      fetchData()
-        // make sure to catch any error
-        .catch(console.error);
-
-        
-
-      console.log("effect applied - only on the FIRST mount");
-      
+      opts.current = {
+        height: "390",
+        width: "640",
+        playerVars: {
+          // https://developers.google.com/youtube/player_parameters
+          autoplay: 1,
+          start: thePlaylist[currentId.current].start,
+          end: thePlaylist[currentId.current].end,
+          controls: 0,
+          iv_load_policy: 3,
+          rel: 0
+        },
+      };
     }
+
+    // call the function, making sure to catch any error
+    fetchDataInUseEffect().catch(console.error);
 
     return () => {
       effectRan.current = true;
@@ -106,12 +64,7 @@ const PlaylistPlayer: React.FC = () => {
   }, []);
 
   const onPlayerReady: YouTubeProps["onReady"] = (event) => {
-    // access to player in all event handlers via event.target
     console.log("onPlayerReady is called!");
-    //console.log(event.target)
-    //event.target.playVideo();
-    //let thePlaylist = await fetchThePlaylist();
-    //console.log(thePlaylist);
   };
 
   const videoPlay = (event: any) => {
@@ -132,13 +85,7 @@ const PlaylistPlayer: React.FC = () => {
       console.log("YouTube Video is ENDING!!");
       currentId.current = 1 + currentId.current;
       if (playList[currentId.current]) {
-        // player.loadVideoById({
-        //     'videoId': playList[currentId.current].videoId,
-        //     'startSeconds': playList[currentId.current].start,
-        //     'endSeconds': playList[currentId.current].end
-        // });
         setVideoId(playList[currentId.current].videoId);
-        //videoId.current = playList[currentId.current].videoId;
         opts.current = {
           ...opts.current,
           playerVars: {
@@ -148,8 +95,6 @@ const PlaylistPlayer: React.FC = () => {
             end: playList[currentId.current].end,
           },
         };
-        //opts.current.playerVars.start = playList[currentId.current].start;
-        //opts.current.playerVars.end = playList[currentId.current].end;
       }
     }
   };
@@ -193,10 +138,10 @@ const PlaylistPlayer: React.FC = () => {
             onReady={onPlayerReady}
             onStateChange={videoPlay}
           />
-          <button onClick={() => {
-            //opts.current = {...opts.current, controls: '0'}
+          <IonButton onClick={() => {
             setVideoId(playList[currentId.current].videoId);
-          }}>Play</button>
+          }}>Play
+          </IonButton>
         </ExploreContainer>
       </IonContent>
     </IonPage>

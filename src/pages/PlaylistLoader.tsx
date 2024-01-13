@@ -16,7 +16,6 @@ const PlaylistLoader: React.FC = () => {
   const effectHasRun = useRef(false);
   const isDebouncing = useRef(false);
   const theCurrentId = useRef(0);
-  //const videoId = useRef(playList[currentId.current].videoId);
   const [videoId, setVideoId] = useState('');
   const myOptions = useRef<YouTubeProps["opts"]>({
     height: "195",
@@ -53,7 +52,6 @@ const PlaylistLoader: React.FC = () => {
         videoId: item,
         start: 1,
         end: 61
-
       }
     }));
   };
@@ -70,7 +68,7 @@ const PlaylistLoader: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Edit Playlist</IonTitle>
+          <IonTitle>Load Playlist</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
