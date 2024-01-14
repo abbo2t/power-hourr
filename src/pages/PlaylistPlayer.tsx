@@ -18,9 +18,11 @@ const PlaylistPlayer: React.FC = () => {
   const effectRan = useRef(false);
   const debouncing = useRef(false);
   const currentId = useRef(0);
+  const opts = useRef({});
   const [videoId, setVideoId] = useState('AjWfY7SnMBI');
   const [playList, setPlayList] = useState<any[]>([]);
-  let opts = useRef({});
+  const [fullscreen, setFullscreen] = useState(false);
+
 
   useEffect(() => {
 
@@ -116,7 +118,7 @@ const PlaylistPlayer: React.FC = () => {
         </IonHeader>
         <ExploreContainer name="Playlist Player Page">
           <h2>Play your playlist</h2>
-          <div>
+          <div className={fullscreen ? 'fullscreen' : ''}>
           <YouTube
             videoId={videoId}
             opts={opts.current}
@@ -124,7 +126,7 @@ const PlaylistPlayer: React.FC = () => {
             onStateChange={videoPlay}
           />
           </div>
-          <IonButton disabled={currentId.current == 0
+          <IonButton className="play-button" disabled={currentId.current == 0
             && playList[currentId.current]
             && playList[currentId.current].videoId === videoId}
                      onClick={() => {
@@ -142,6 +144,11 @@ const PlaylistPlayer: React.FC = () => {
                        setVideoId(playList[currentId.current].videoId);
                      }}>{currentId.current == 0
             && playList[currentId.current] ? 'Play' : 'Restart'}
+          </IonButton>
+          <IonButton className={fullscreen ? 'fullscreen-button' : ''} onClick={() => {
+            setFullscreen(!fullscreen);
+          }}>
+            Fullscreen
           </IonButton>
         </ExploreContainer>
       </IonContent>

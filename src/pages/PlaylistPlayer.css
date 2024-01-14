@@ -4,10 +4,29 @@ iframe {
 }
 
 .fullscreen {
+    width: 100vw;
+    height: 100vh;
+}
+
+.fullscreen iframe {
     top: 0;
     left: 0;
     bottom: 0;
     right: 0;
     width: 100vw;
     height: 100vh;
+    position: fixed;
+    z-index: 9998;
+}
+
+.fullscreen + .play-button{
+    display: none
+}
+
+.fullscreen-button {
+    position: fixed;
+    right: 0;
+    top: 80%;
+    z-index: 9999;
+    opacity: 0.5
 }
