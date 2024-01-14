@@ -1,67 +1,92 @@
 import {
-  IonButton,
-  IonContent,
-  IonHeader, IonItem, IonLabel, IonList,
-  IonPage, IonReorder, IonReorderGroup,
+  IonButton, IonCol,
+  IonContent, IonGrid,
+  IonHeader, IonInput, IonItem, IonLabel, IonList,
+  IonPage, IonReorder, IonReorderGroup, IonRow,
   IonTitle,
   IonToolbar, ItemReorderEventDetail,
 } from "@ionic/react";
-import YouTube, { YouTubeProps } from "react-youtube";
+import YouTube, {YouTubeProps} from "react-youtube";
 import ExploreContainer from "../components/ExploreContainer";
 import "./PlaylistLoader.css";
-import { useEffect, useState, useRef } from "react";
-import { Storage } from '@ionic/storage';
+import {useEffect, useState, useRef} from "react";
+import {Storage} from '@ionic/storage';
+import {storePhlist, fetchPhlist, storePlaylistInfo, fetchPlaylistInfo, fetchInterstitial} from '../utilities';
 
 const PlaylistLoader: React.FC = () => {
-  const effectHasRun = useRef(false);
+  const effectRan = useRef(false);
   const isDebouncing = useRef(false);
   const theCurrentId = useRef(0);
   const [videoId, setVideoId] = useState('');
-  const myOptions = useRef<YouTubeProps["opts"]>({
+  const [listId, setListId] = useState('');
+  const [myOptions, setMyOptions] = useState<YouTubeProps["opts"]>({
     height: "195",
     width: "320",
     playerVars: {
       // https://developers.google.com/youtube/player_parameters
-      autoplay: 1,
+      autoplay: 0,
       controls: 1,
       iv_load_policy: 3,
       rel: 0,
       listType: 'playlist',
-      list: 'PL8sCGko3uCsUZJKEGgy20SItUZQGpUPz0'
+      // list: 'PL8sCGko3uCsUZJKEGgy20SItUZQGpUPz0'
+      list: ''
     },
   });
+
+  useEffect(() => {
+    if (!effectRan.current) {
+      console.log("effect applied - only on the FIRST mount");
+    }
+
+    const fetchDataInUseEffect = async () => {
+      let thePlaylistInfo = await fetchPlaylistInfo();
+      if (thePlaylistInfo) {
+        setListId(thePlaylistInfo.id);
+      }
+    }
+
+    fetchDataInUseEffect().catch(console.error);
+
+    return () => {
+      effectRan.current = true;
+    };
+  }, []);
 
   const storeMyPlaylist = async (playlist: any) => {
     const store = new Storage();
     await store.create();
 
-    // await store.set('playlist', [{
-    //     videoId: playlist[0],
-    //     start: 50,
-    //     end: 60
-    // },
-    // {
-    //     videoId: playlist[1],
-    //     start: 31,
-    //     end: 35
-    // }]);
+    const fetchedPlayList = await fetchPhlist();
 
     // @ts-ignore
-    await store.set('playlist', playlist.map((item, index) => {
+    const updatedPlayList = playlist.map((item, index) => {
+      const i = fetchedPlayList.findIndex((e: { videoId: any; }) => e.videoId === item);
+      if (i > -1) {
+        return {
+          ...fetchedPlayList[i]
+        }
+      }
+
       return {
         videoId: item,
         start: 1,
         end: 61
       }
-    }));
+    });
+
+    await storePhlist(updatedPlayList);
   };
 
   const onMyPlayerReady: YouTubeProps["onReady"] = async (event) => {
     // access to player in all event handlers via event.target
     console.log("onPlayerReady is called!");
-    const myPlaylist = event.target.getPlaylist();
-    console.log(myPlaylist);
-    await storeMyPlaylist(myPlaylist);
+    event.target.mute();
+    if (event.target.getPlaylist()) {
+      const myPlaylist = event.target.getPlaylist();
+      console.log('got playlist', myPlaylist, event.target);
+      await storeMyPlaylist(myPlaylist);
+    }
   };
 
   return (
@@ -79,18 +104,43 @@ const PlaylistLoader: React.FC = () => {
         </IonHeader>
         <ExploreContainer name="Playlist Editor Page">
           <h2>Load your playlist</h2>
-          <div className={"hidden"}>
-          <YouTube
-              opts={myOptions.current}
-              onReady={onMyPlayerReady}
-          />
-          </div>
-          <IonList>
-          </IonList>
-          <IonButton onClick={() => {
-            //opts.current = {...opts.current, controls: '0'}
-            //setVideoId(playList[currentId.current].videoId);
-          }}>Save</IonButton>
+          <IonGrid>
+            <IonRow>
+              <IonCol size="12" size-sm="8" offsetSm="2">
+                <div>
+                  <YouTube
+                    opts={myOptions}
+                    onReady={onMyPlayerReady}
+                  />
+                </div>
+                <IonList>
+                  <IonItem>
+                    <IonInput label="Playlist ID" placeholder="Enter playlist ID" value={listId}
+                              onIonInput={(ev: Event) => {
+                                const value = (ev.target as HTMLIonInputElement).value as string;
+                                setListId(value);
+                              }}></IonInput>
+                  </IonItem>
+                </IonList>
+                <IonButton onClick={() => {
+                  const updatedOptions = {
+                    ...myOptions,
+                    playerVars: {
+                      // @ts-ignore
+                      ...myOptions.playerVars,
+                      'list': listId
+                    },
+                  };
+                  ;
+                  setMyOptions(updatedOptions);
+                  storePlaylistInfo({'id': listId}).catch(console.error);
+                  console.log(myOptions);
+                  //opts.current = {...opts.current, controls: '0'}
+                  //setVideoId(playList[currentId.current].videoId);
+                }}>Load</IonButton>
+              </IonCol>
+            </IonRow>
+          </IonGrid>
         </ExploreContainer>
       </IonContent>
     </IonPage>

@@ -52,7 +52,7 @@ const PlaylistEditor: React.FC = () => {
           width: "640",
           playerVars: {
             // https://developers.google.com/youtube/player_parameters
-            autoplay: 1,
+            autoplay: 0,
             start: playList[currentId.current] ? playList[currentId.current].start : 0,
             //end: playList[currentId.current].end,
             controls: 0,
@@ -132,7 +132,7 @@ const PlaylistEditor: React.FC = () => {
                 <IonCol size="12" size-sm="6">
                   <IonAccordionGroup ref={accordionGroup} multiple={false}>
                     <IonAccordion value="first">
-                      <IonItem slot="header">
+                      <IonItem slot="header" color="rose">
                         Playlist
                       </IonItem>
                       <div slot="content">
@@ -157,7 +157,7 @@ const PlaylistEditor: React.FC = () => {
                       </div>
                     </IonAccordion>
                     <IonAccordion value="second">
-                      <IonItem slot="header">
+                      <IonItem slot="header" color="rose">
                         Interstitial
                       </IonItem>
                       <div slot="content">

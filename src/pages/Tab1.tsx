@@ -14,6 +14,8 @@ import ExploreContainer from "../components/ExploreContainer";
 import "./Tab1.css";
 
 const Tab1: React.FC = () => {
+  let playlist: string | any[] = [];
+  let editing = playlist && playlist.length;
   return (
     <IonPage>
       <IonHeader>
@@ -27,12 +29,12 @@ const Tab1: React.FC = () => {
             <IonTitle size="large">Playlists</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <ExploreContainer name="Playlists Page">
+        <ExploreContainer name="Power Hourr">
 
-          <IonCard  routerLink="/editor/1">
+          <IonCard routerLink={editing ? '/editor/1' : '/loader/1'}>
             <IonCardHeader>
-              <IonCardTitle>New Year's Eve 2023</IonCardTitle>
-              <IonCardSubtitle>60 Tracks</IonCardSubtitle>
+              <IonCardTitle>{editing ? 'Edit' : 'Create'} Your Playlist</IonCardTitle>
+              <IonCardSubtitle>{editing ? playlist.length + ' Videos': 'New'}</IonCardSubtitle>
             </IonCardHeader>
 
             <IonCardContent>

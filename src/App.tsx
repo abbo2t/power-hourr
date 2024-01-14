@@ -10,12 +10,20 @@ import {
   setupIonicReact
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { listOutline, libraryOutline, personOutline } from 'ionicons/icons';
+import {
+  listOutline,
+  libraryOutline,
+  personOutline,
+  createOutline,
+  playCircleOutline,
+  reloadOutline
+} from 'ionicons/icons';
 import Tab1 from './pages/Tab1';
 import Tab2 from './pages/Tab2';
 import Tab3 from './pages/Tab3';
 import PlaylistLoader from './pages/PlaylistLoader';
 import PlaylistPlayer from './pages/PlaylistPlayer';
+import PlaylistEditor from "./pages/PlaylistEditor";
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -35,7 +43,7 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
-import PlaylistEditor from "./pages/PlaylistEditor";
+
 
 setupIonicReact();
 
@@ -67,17 +75,17 @@ const App: React.FC = () => (
           </Route>
         </IonRouterOutlet>
         <IonTabBar slot="bottom">
-          <IonTabButton tab="tab1" href="/tab1">
-            <IonIcon aria-hidden="true" icon={listOutline} />
-            <IonLabel>Playlists</IonLabel>
+          <IonTabButton tab="tab1" href="/editor/1">
+            <IonIcon aria-hidden="true" icon={createOutline} />
+            <IonLabel>Edit</IonLabel>
           </IonTabButton>
-          <IonTabButton tab="tab2" href="/tab2">
-            <IonIcon aria-hidden="true" icon={libraryOutline} />
-            <IonLabel>Library</IonLabel>
+          <IonTabButton tab="tab2" href="/play/1">
+            <IonIcon aria-hidden="true" icon={playCircleOutline} />
+            <IonLabel>Play</IonLabel>
           </IonTabButton>
-          <IonTabButton tab="tab3" href="/tab3">
-            <IonIcon aria-hidden="true" icon={personOutline} />
-            <IonLabel>Profile</IonLabel>
+          <IonTabButton tab="tab3" href="/loader/1">
+            <IonIcon aria-hidden="true" icon={reloadOutline} />
+            <IonLabel>Load</IonLabel>
           </IonTabButton>
         </IonTabBar>
       </IonTabs>
