@@ -10,9 +10,8 @@ import YouTube, {YouTubeProps} from "react-youtube";
 import ExploreContainer from "../components/ExploreContainer";
 import "./PlaylistPlayer.css";
 import {useEffect, useState, useRef} from "react";
-import {fetchPhlist, fetchInterstitial} from "../utilities";
+import {fetchPhlist, fetchInterstitial, interleave} from "../utilities";
 
-const interleave = (arr: any[], x: any) => arr.flatMap(e => [e, x]).slice(0, -1);
 
 const PlaylistPlayer: React.FC = () => {
   const effectRan = useRef(false);

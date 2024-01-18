@@ -62,3 +62,5 @@ export const getLengthOfVideo = (video: any) => {
         ? Math.floor(video.length)
         : 100
 };
+
+export const interleave = (arr: any[], x: any) => arr.flatMap(e => [e, x]).slice(0, -1);

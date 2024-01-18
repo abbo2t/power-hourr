@@ -1,0 +1,7 @@
+.hidden{
+    display: none
+}
+
+.export-code, .import-code{
+    font-family: monospace;
+}

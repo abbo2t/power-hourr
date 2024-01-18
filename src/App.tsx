@@ -16,7 +16,7 @@ import {
   personOutline,
   createOutline,
   playCircleOutline,
-  reloadOutline
+  reloadOutline, downloadOutline
 } from 'ionicons/icons';
 import Tab1 from './pages/Tab1';
 import Tab2 from './pages/Tab2';
@@ -43,6 +43,7 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import PlaylistImporter from "./pages/PlaylistImporter";
 
 
 setupIonicReact();
@@ -70,6 +71,9 @@ const App: React.FC = () => (
           <Route path="/editor/:id">
             <PlaylistEditor />
           </Route>
+          <Route path="/export/:id">
+            <PlaylistImporter />
+          </Route>
           <Route exact path="/">
             <Redirect to="/tab1" />
           </Route>
@@ -86,6 +90,10 @@ const App: React.FC = () => (
           <IonTabButton tab="tab3" href="/loader/1">
             <IonIcon aria-hidden="true" icon={reloadOutline} />
             <IonLabel>Load</IonLabel>
+          </IonTabButton>
+          <IonTabButton tab="tab4" href="/export/1">
+            <IonIcon aria-hidden="true" icon={downloadOutline} />
+            <IonLabel>Export</IonLabel>
           </IonTabButton>
         </IonTabBar>
       </IonTabs>
