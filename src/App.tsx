@@ -93,7 +93,7 @@ const App: React.FC = () => (
           </IonTabButton>
           <IonTabButton tab="tab4" href="/export/1">
             <IonIcon aria-hidden="true" icon={downloadOutline} />
-            <IonLabel>Export</IonLabel>
+            <IonLabel>Import</IonLabel>
           </IonTabButton>
         </IonTabBar>
       </IonTabs>

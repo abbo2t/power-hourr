@@ -12,7 +12,15 @@ import ExploreContainer from "../components/ExploreContainer";
 import "./PlaylistImporter.css";
 import {useEffect, useState, useRef} from "react";
 import {Storage} from '@ionic/storage';
-import {storePhlist, fetchPhlist, storePlaylistInfo, fetchPlaylistInfo, fetchInterstitial, interleave} from '../utilities';
+import {
+  storePhlist,
+  fetchPhlist,
+  storePlaylistInfo,
+  fetchPlaylistInfo,
+  fetchInterstitial,
+  interleave,
+  storeInterstitial
+} from '../utilities';
 
 const PlaylistImporter: React.FC = () => {
   const effectRan = useRef(false);
@@ -68,11 +76,39 @@ const PlaylistImporter: React.FC = () => {
     let theInterstitial = await fetchInterstitial();
     const thePlaylist = await fetchPhlist();
     if (thePlaylist) {
-      if (theInterstitial && withInterstitial) {
+      if (theInterstitial && withInterstitial && theInterstitial.videoId) {
         setExportCode(JSON.stringify(interleave(thePlaylist, theInterstitial)));
       } else {
         setExportCode(JSON.stringify(thePlaylist));
       }
+    }
+  };
+
+  const importPlaylist = async (playlist: any) => {
+
+    // check if playlist has multiples of the same videoId
+    const duplicates = playlist
+      .map((e: { [x: string]: any; }) => e['videoId'])
+      .map((e: any, i: any, final: string | any[]) => final.indexOf(e) !== i && i)
+      .filter((obj: string | number)=> playlist[obj])
+      .map((e: string | number) => playlist[e])
+
+    console.log('Duplicates:', duplicates);
+    if (duplicates.length) {
+      // Remove all instances of duplicate video
+      const filteredArr = playlist.filter((obj: { videoId: any; }) => obj.videoId !== duplicates[0].videoId);
+      // Store de-interstitialized playlist as phlist
+      await storePhlist(filteredArr);
+      // Store interstitial
+      await storeInterstitial({
+        end: duplicates[0].end,
+        length: duplicates[0].length,
+        start: duplicates[0].start,
+        title: duplicates[0].title,
+        videoId: duplicates[0].videoId
+      });
+    } else {
+      await storePhlist(playlist);
     }
   };
 
@@ -106,6 +142,7 @@ const PlaylistImporter: React.FC = () => {
                   </IonItem>
                 </IonList>
                 <IonButton onClick={() => {
+                  // TODO: Save as JSON file
                 }}>Export</IonButton>
               </IonCol>
             </IonRow>
@@ -116,11 +153,28 @@ const PlaylistImporter: React.FC = () => {
               <IonCol size="12" size-sm="8" offsetSm="2">
                 <IonList>
                   <IonItem>
-                    <IonTextarea className="import-code" autoGrow={true} value={importCode}></IonTextarea>
+                    <IonTextarea
+                      className="import-code"
+                      autoGrow={true}
+                      value={importCode}
+                      onBlur={(e) => {
+                        // @ts-ignore
+                        setImportCode(e.target.value);
+                      }}></IonTextarea>
                   </IonItem>
                 </IonList>
-                <IonButton onClick={() => {
+                <IonButton onClick={(e) => {
+                  let playListString = '';
+                  try {
+                    playListString = JSON.parse(importCode);
+                  } catch (exception) {
+                    console.error('JSON format error.', importCode)
+                    return;
+                  }
+                  console.log('Playlist string:', playListString);
+                  importPlaylist(playListString).catch(console.error);
                 }}>Import</IonButton>
+                <br/><br/><br/><br/>
               </IonCol>
             </IonRow>
           </IonGrid>

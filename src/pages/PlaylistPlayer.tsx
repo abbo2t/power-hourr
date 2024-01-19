@@ -34,7 +34,7 @@ const PlaylistPlayer: React.FC = () => {
       let theInterstitial = await fetchInterstitial();
       let thePlaylist = await fetchPhlist();
       if (thePlaylist) {
-        if (theInterstitial) {
+        if (theInterstitial && theInterstitial.videoId) {
           setPlayList(interleave(thePlaylist, theInterstitial));
         } else {
           setPlayList(thePlaylist);

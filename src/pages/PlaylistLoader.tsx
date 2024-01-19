@@ -102,7 +102,7 @@ const PlaylistLoader: React.FC = () => {
             <IonTitle size="large">Load</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <ExploreContainer name="Playlist Editor Page">
+        <ExploreContainer name="Playlist Loader Page">
           <h2>Load your playlist</h2>
           <IonGrid>
             <IonRow>

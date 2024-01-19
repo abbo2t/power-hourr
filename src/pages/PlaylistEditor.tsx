@@ -177,7 +177,7 @@ const PlaylistEditor: React.FC = () => {
                           };
                           setVideoId(interstitial.videoId);
                         }}>
-                          <IonLabel>{interstitial.title ? interstitial.title : '--'}</IonLabel>
+                          <IonLabel>{interstitial.videoId && interstitial.title ? interstitial.title : '--'}</IonLabel>
                         </IonItem>
                         <IonItem>
                           <IonInput label="VideoID" type="text" placeholder="e.g., dQw4w9WgXcQ"
