@@ -12,6 +12,7 @@ import ExploreContainer from "../components/ExploreContainer";
 import "./PlaylistImporter.css";
 import {useEffect, useState, useRef} from "react";
 import {Storage} from '@ionic/storage';
+import {saveAs} from 'file-saver';
 import {
   storePhlist,
   fetchPhlist,
@@ -45,6 +46,7 @@ const PlaylistImporter: React.FC = () => {
   const [importCode, setImportCode] = useState("");
   const [exportCode, setExportCode] = useState("");
   const [includeInterstitial, setIncludeInterstitial] = useState(false);
+  const [filename, setFilename] = useState("playlist");
 
   useEffect(() => {
     if (!effectRan.current) {
@@ -66,6 +68,39 @@ const PlaylistImporter: React.FC = () => {
       effectRan.current = true;
     };
   }, []);
+
+  const handleSaveButtonClick = () => {
+    const adjustedFilename = filename.endsWith('.json') ? filename : `${filename}.json`;
+    // Create a Blob containing the JSON data
+    const blob = new Blob([exportCode], {type: 'application/json'});
+    // Trigger the "Save As" dialog
+    saveAs(blob, adjustedFilename);
+  };
+  // @ts-ignore
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+
+    if (file) {
+      // Read the content of the file
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        try {
+          // Parse the JSON content of the file
+          // @ts-ignore
+          //const jsonObject = JSON.parse(event.target.result);
+
+          // Use the parsed object in your application
+          //setUploadedFile(jsonObject);
+          setImportCode(event.target.result);
+        } catch (error) {
+          console.error('Error parsing JSON file:', error);
+        }
+      };
+
+      reader.readAsText(file);
+    }
+  };
 
   const storeMyPlaylist = async (playlist: any) => {
     const fetchedPlayList = await fetchPhlist();
@@ -90,7 +125,7 @@ const PlaylistImporter: React.FC = () => {
     const duplicates = playlist
       .map((e: { [x: string]: any; }) => e['videoId'])
       .map((e: any, i: any, final: string | any[]) => final.indexOf(e) !== i && i)
-      .filter((obj: string | number)=> playlist[obj])
+      .filter((obj: string | number) => playlist[obj])
       .map((e: string | number) => playlist[e])
 
     console.log('Duplicates:', duplicates);
@@ -140,9 +175,15 @@ const PlaylistImporter: React.FC = () => {
                       formatPlaylistForExport(!includeInterstitial).catch(console.error);
                     }}>Include interstitial?</IonCheckbox>
                   </IonItem>
+                  <IonItem>
+                    <IonInput label="Filename" value={filename} onIonChange={(e) => {
+                      // @ts-ignore
+                      setFilename(e.target.value);
+                    }}></IonInput>
+                  </IonItem>
                 </IonList>
                 <IonButton onClick={() => {
-                  // TODO: Save as JSON file
+                  return handleSaveButtonClick();
                 }}>Export</IonButton>
               </IonCol>
             </IonRow>
@@ -163,6 +204,7 @@ const PlaylistImporter: React.FC = () => {
                       }}></IonTextarea>
                   </IonItem>
                 </IonList>
+                <input type="file" accept=".json" onChange={handleFileChange}/>
                 <IonButton onClick={(e) => {
                   let playListString = '';
                   try {
