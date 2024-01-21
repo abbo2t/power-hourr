@@ -66,8 +66,14 @@ const PlaylistPlayer: React.FC = () => {
 
   const onPlayerReady: YouTubeProps["onReady"] = (event) => {
     console.log("onPlayerReady is called!", event.target);
-    //event.target.setFauxFullscreen();
-
+    if(event.target.getVideoData()) {
+      console.log('Video Error Code', event.target.getVideoData().errorCode);
+      // If error, go to next video
+      if( event.target.getVideoData().errorCode ) {
+        debouncing.current = false;
+        videoPlay({data: YouTube.PlayerState.ENDED});
+      }
+    }
   };
 
   const videoPlay = (event: any) => {
