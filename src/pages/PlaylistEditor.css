@@ -24,3 +24,7 @@ iframe {
 div[slot='content'] {
     background: rgba(var(--ion-color-rose-rgb), 0.25);
 }
+
+ion-toolbar.large-title-fix {
+    padding-top: env(safe-area-inset-top);
+}

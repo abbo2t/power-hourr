@@ -77,6 +77,7 @@ const PlaylistEditor: React.FC = () => {
       // access to player in all event handlers via event.target
       console.log("onPlayerReady is called!", currentId.current, event.target);
       if ('24 hours + of pure black screen in HD!' !== event.target.videoTitle && '' !== event.target.videoTitle) {
+        currentLength.current = Math.floor(event.target.getDuration());
         if (videoId === interstitial.videoId) {
           const updatedInterstitial = {
             ...interstitial,
@@ -196,22 +197,101 @@ const PlaylistEditor: React.FC = () => {
                   </IonAccordionGroup>
                 </IonCol>
                 <IonCol size="12" size-sm="6">
-                  <YouTube
-                    videoId={videoId}
-                    opts={opts.current}
-                    onReady={onPlayerReady}
-                  />
-                  {videoId !== interstitial.videoId ? (
-                    <IonRange
-                      aria-label="Dual Knobs Range"
-                      dualKnobs={true}
-                      disabled={'AjWfY7SnMBI' === videoId || '' === videoId}
-                      min={0}
-                      max={currentLength.current}
-                      onIonChange={
-                        ({detail}) => {
-                          console.log('ionChange emitted value: ', detail.value);
-                          if (playList[currentId.current]) {
+                  <div className={"position-fixed"}>
+                    <YouTube
+                      videoId={videoId}
+                      opts={opts.current}
+                      onReady={onPlayerReady}
+                    />
+                    {videoId !== interstitial.videoId ? (
+                      <IonRange
+                        aria-label="Dual Knobs Range"
+                        dualKnobs={true}
+                        disabled={'AjWfY7SnMBI' === videoId || '' === videoId}
+                        min={0}
+                        max={currentLength.current}
+                        onIonChange={
+                          ({detail}) => {
+                            console.log('ionChange emitted value: ', detail.value);
+                            if (playList[currentId.current]) {
+                              // update YouTube playhead
+                              // @ts-ignore
+                              if (currentRange.current.lower !== detail.value.lower) {
+                                opts.current = {
+                                  ...opts,
+                                  playerVars: {
+                                    // @ts-ignore
+                                    ...opts.playerVars,
+                                    autoplay: 1,
+                                    controls: 0,
+                                    // @ts-ignore
+                                    start: detail.value.lower,
+                                    // @ts-ignore
+                                    end: detail.value.upper,
+                                    // @ts-ignore
+                                    //end: detail.value.lower + 60,
+                                  },
+                                };
+                                // @ts-ignore
+                                currentRange.current.upper = Math.min(detail.value.lower + 60, getLengthOfVideo(playList[currentId.current]));
+                                // @ts-ignore
+                                currentRange.current.lower = detail.value.lower;
+                                // @ts-ignore
+                              } else if (currentRange.current.upper !== detail.value.upper) {
+                                opts.current = {
+                                  ...opts,
+                                  playerVars: {
+                                    // @ts-ignore
+                                    ...opts.playerVars,
+                                    autoplay: 1,
+                                    controls: 0,
+                                    // @ts-ignore
+                                    start: detail.value.upper,
+                                    // @ts-ignore
+                                    end: getLengthOfVideo(playList[currentId.current])
+                                  },
+                                };
+                                // @ts-ignore
+                                currentRange.current.upper = detail.value.upper;
+                                // @ts-ignore
+                                currentRange.current.lower = Math.max(0, detail.value.upper - 60);
+                              }
+
+                              const updatedPlayList = playList.map((item, ix) => {
+                                return ix === currentId.current ? {
+                                  ...playList[ix],
+                                  // @ts-ignore
+                                  start: currentRange.current.lower,
+                                  // @ts-ignore
+                                  end: currentRange.current.upper
+                                  // @ts-ignore
+                                  //end: detail.value.lower + 60
+                                } : {...playList[ix]};
+                              })
+                              setPlayList(updatedPlayList);
+                              storePhlist(updatedPlayList).catch(console.error);
+                            }
+                          }
+                        }
+                        value={{
+                          lower: playList[currentId.current] ? playList[currentId.current].start : 0,
+                          upper: playList[currentId.current] ? playList[currentId.current].end : 0,
+                        }}
+                      ></IonRange>
+                    ) : (
+                      <IonRange
+                        aria-label="Dual Knob Range"
+                        dualKnobs={true}
+                        disabled={'AjWfY7SnMBI' === videoId || '' === videoId}
+                        min={0}
+                        max={currentLength.current}
+                        value={{
+                          lower: interstitial ? interstitial.start : 0,
+                          upper: interstitial ? interstitial.end : 0
+                        }}
+                        onIonChange={({detail}) => {
+                          console.log('Interstitial range change.');
+                          if (interstitial) {
                             // update YouTube playhead
                             // @ts-ignore
                             if (currentRange.current.lower !== detail.value.lower) {
@@ -231,7 +311,7 @@ const PlaylistEditor: React.FC = () => {
                                 },
                               };
                               // @ts-ignore
-                              currentRange.current.upper = Math.min(detail.value.lower + 60, getLengthOfVideo(playList[currentId.current]));
+                              currentRange.current.upper = detail.value.upper;
                               // @ts-ignore
                               currentRange.current.lower = detail.value.lower;
                               // @ts-ignore
@@ -252,107 +332,28 @@ const PlaylistEditor: React.FC = () => {
                               // @ts-ignore
                               currentRange.current.upper = detail.value.upper;
                               // @ts-ignore
-                              currentRange.current.lower = Math.max(0, detail.value.upper - 60);
+                              currentRange.current.lower = detail.value.lower;
                             }
 
-                            const updatedPlayList = playList.map((item, ix) => {
-                              return ix === currentId.current ? {
-                                ...playList[ix],
-                                // @ts-ignore
-                                start: currentRange.current.lower,
-                                // @ts-ignore
-                                end: currentRange.current.upper
-                                // @ts-ignore
-                                //end: detail.value.lower + 60
-                              } : {...playList[ix]};
-                            })
-                            setPlayList(updatedPlayList);
-                            storePhlist(updatedPlayList).catch(console.error);
-                          }
-                        }
-                      }
-                      value={{
-                        lower: playList[currentId.current] ? playList[currentId.current].start : 0,
-                        upper: playList[currentId.current] ? playList[currentId.current].end : 0,
-                      }}
-                    ></IonRange>
-                  ) : (
-                    <IonRange
-                      aria-label="Dual Knob Range"
-                      dualKnobs={true}
-                      disabled={'AjWfY7SnMBI' === videoId || '' === videoId}
-                      min={0}
-                      max={currentLength.current}
-                      value={{
-                        lower: interstitial ? interstitial.start : 0,
-                        upper: interstitial ? interstitial.end : 0
-                      }}
-                      onIonChange={({detail}) => {
-                        console.log('Interstitial range change.');
-                        if (interstitial) {
-                          // update YouTube playhead
-                          // @ts-ignore
-                          if (currentRange.current.lower !== detail.value.lower) {
-                            opts.current = {
-                              ...opts,
-                              playerVars: {
-                                // @ts-ignore
-                                ...opts.playerVars,
-                                autoplay: 1,
-                                controls: 0,
-                                // @ts-ignore
-                                start: detail.value.lower,
-                                // @ts-ignore
-                                end: detail.value.upper,
-                                // @ts-ignore
-                                //end: detail.value.lower + 60,
-                              },
-                            };
-                            // @ts-ignore
-                            currentRange.current.upper = detail.value.upper;
-                            // @ts-ignore
-                            currentRange.current.lower = detail.value.lower;
-                            // @ts-ignore
-                          } else if (currentRange.current.upper !== detail.value.upper) {
-                            opts.current = {
-                              ...opts,
-                              playerVars: {
-                                // @ts-ignore
-                                ...opts.playerVars,
-                                autoplay: 1,
-                                controls: 0,
-                                // @ts-ignore
-                                start: detail.value.upper,
-                                // @ts-ignore
-                                end: getLengthOfVideo(playList[currentId.current])
-                              },
-                            };
-                            // @ts-ignore
-                            currentRange.current.upper = detail.value.upper;
-                            // @ts-ignore
-                            currentRange.current.lower = detail.value.lower;
-                          }
-
-                          const updatedInterstitial = {
+                            const updatedInterstitial = {
                               ...interstitial,
                               // @ts-ignore
                               start: currentRange.current.lower,
                               // @ts-ignore
                               end: currentRange.current.upper
-                          };
-                          setInterstitial(updatedInterstitial);
-                          storeInterstitial(updatedInterstitial).catch(console.error);
-                        }
-                      }}>
-                    </IonRange>
-                  )
-                  }
+                            };
+                            setInterstitial(updatedInterstitial);
+                            storeInterstitial(updatedInterstitial).catch(console.error);
+                          }
+                        }}>
+                      </IonRange>
+                    )
+                    }</div>
                   <p>Copyright</p>
                   <p>&copy; 2024</p>
                 </IonCol>
               </IonRow>
             </IonGrid>
-
           </ExploreContainer>
         </IonContent>
       </IonPage>
