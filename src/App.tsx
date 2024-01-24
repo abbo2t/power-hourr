@@ -50,7 +50,7 @@ setupIonicReact();
 
 const App: React.FC = () => (
   <IonApp>
-    <IonReactRouter>
+    <IonReactRouter basename={typeof window !== 'undefined' && window.location.pathname.startsWith('/power-hourr') ? '/power-hourr' : ''}>
       <IonTabs>
         <IonRouterOutlet>
           <Route exact path="/tab1">
