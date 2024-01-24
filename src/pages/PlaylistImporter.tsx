@@ -4,7 +4,7 @@ import {
   IonHeader, IonInput, IonItem, IonLabel, IonList,
   IonPage, IonReorder, IonReorderGroup, IonRow,
   IonTextarea,
-  IonTitle,
+  IonTitle, IonToast,
   IonToolbar, ItemReorderEventDetail,
 } from "@ionic/react";
 import YouTube, {YouTubeProps} from "react-youtube";
@@ -47,6 +47,8 @@ const PlaylistImporter: React.FC = () => {
   const [exportCode, setExportCode] = useState("");
   const [includeInterstitial, setIncludeInterstitial] = useState(false);
   const [filename, setFilename] = useState("playlist");
+  const [isToastOpen, setIsToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   useEffect(() => {
     if (!effectRan.current) {
@@ -145,6 +147,8 @@ const PlaylistImporter: React.FC = () => {
     } else {
       await storePhlist(playlist);
     }
+    setToastMessage('Import Successful!')
+    setIsToastOpen(true);
   };
 
   return (
@@ -211,6 +215,8 @@ const PlaylistImporter: React.FC = () => {
                     playListString = JSON.parse(importCode);
                   } catch (exception) {
                     console.error('JSON format error.', importCode)
+                    setToastMessage('JSON format error.');
+                    setIsToastOpen(true);
                     return;
                   }
                   console.log('Playlist string:', playListString);
@@ -220,6 +226,14 @@ const PlaylistImporter: React.FC = () => {
               </IonCol>
             </IonRow>
           </IonGrid>
+          <IonToast
+            isOpen={isToastOpen}
+            message={toastMessage}
+            position="top"
+            positionAnchor="header"
+            onDidDismiss={() => setIsToastOpen(false)}
+            duration={5000}
+          ></IonToast>
         </ExploreContainer>
       </IonContent>
     </IonPage>
