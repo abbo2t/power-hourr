@@ -34,16 +34,16 @@ const PlaylistLoader: React.FC = () => {
     },
   });
 
+  const fetchDataInUseEffect = async () => {
+    let thePlaylistInfo = await fetchPlaylistInfo();
+    if (thePlaylistInfo) {
+      setListId(thePlaylistInfo.id);
+    }
+  }
+
   useEffect(() => {
     if (!effectRan.current) {
       console.log("effect applied - only on the FIRST mount");
-    }
-
-    const fetchDataInUseEffect = async () => {
-      let thePlaylistInfo = await fetchPlaylistInfo();
-      if (thePlaylistInfo) {
-        setListId(thePlaylistInfo.id);
-      }
     }
 
     fetchDataInUseEffect().catch(console.error);
@@ -63,6 +63,7 @@ const PlaylistLoader: React.FC = () => {
 
   useIonViewWillEnter(() => {
     console.log('ionViewWillEnter event fired');
+    fetchDataInUseEffect().catch(console.error);
   });
 
   useIonViewWillLeave(() => {

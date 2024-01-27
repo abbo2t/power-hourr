@@ -50,18 +50,18 @@ const PlaylistImporter: React.FC = () => {
   const [isToastOpen, setIsToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
 
+  const fetchDataInUseEffect = async () => {
+    let thePlaylistInfo = await fetchPlaylistInfo();
+    if (thePlaylistInfo) {
+      setListId(thePlaylistInfo.id);
+    }
+    const fetchedPlayList = await fetchPhlist();
+    setExportCode(JSON.stringify(fetchedPlayList));
+  };
+
   useEffect(() => {
     if (!effectRan.current) {
       console.log("effect applied - only on the FIRST mount");
-    }
-
-    const fetchDataInUseEffect = async () => {
-      let thePlaylistInfo = await fetchPlaylistInfo();
-      if (thePlaylistInfo) {
-        setListId(thePlaylistInfo.id);
-      }
-      const fetchedPlayList = await fetchPhlist();
-      setExportCode(JSON.stringify(fetchedPlayList));
     }
 
     fetchDataInUseEffect().catch(console.error);
@@ -81,6 +81,7 @@ const PlaylistImporter: React.FC = () => {
 
   useIonViewWillEnter(() => {
     console.log('ionViewWillEnter event fired');
+    fetchDataInUseEffect().catch(console.error);
   });
 
   useIonViewWillLeave(() => {

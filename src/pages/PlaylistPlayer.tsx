@@ -23,37 +23,37 @@ const PlaylistPlayer: React.FC = () => {
   const [fullscreen, setFullscreen] = useState(false);
 
 
+  // declare the data fetching function
+  const fetchDataInUseEffect = async () => {
+    let theInterstitial = await fetchInterstitial();
+    let thePlaylist = await fetchPhlist();
+    if (thePlaylist) {
+      if (theInterstitial && theInterstitial.videoId) {
+        setPlayList(interleave(thePlaylist, theInterstitial));
+      } else {
+        setPlayList(thePlaylist);
+      }
+    }
+
+    opts.current = {
+      height: "390",
+      width: "640",
+      playerVars: {
+        // https://developers.google.com/youtube/player_parameters
+        autoplay: 0,
+        start: thePlaylist[currentId.current].start,
+        end: thePlaylist[currentId.current].end,
+        controls: 0,
+        iv_load_policy: 3,
+        rel: 0
+      },
+    };
+  };
+
   useEffect(() => {
 
     if (!effectRan.current) {
       console.log("effect applied - only on the FIRST mount");
-    }
-
-    // declare the data fetching function
-    const fetchDataInUseEffect = async () => {
-      let theInterstitial = await fetchInterstitial();
-      let thePlaylist = await fetchPhlist();
-      if (thePlaylist) {
-        if (theInterstitial && theInterstitial.videoId) {
-          setPlayList(interleave(thePlaylist, theInterstitial));
-        } else {
-          setPlayList(thePlaylist);
-        }
-      }
-
-      opts.current = {
-        height: "390",
-        width: "640",
-        playerVars: {
-          // https://developers.google.com/youtube/player_parameters
-          autoplay: 0,
-          start: thePlaylist[currentId.current].start,
-          end: thePlaylist[currentId.current].end,
-          controls: 0,
-          iv_load_policy: 3,
-          rel: 0
-        },
-      };
     }
 
     // call the function, making sure to catch any error
@@ -74,6 +74,7 @@ const PlaylistPlayer: React.FC = () => {
 
   useIonViewWillEnter(() => {
     console.log('ionViewWillEnter event fired');
+    fetchDataInUseEffect().catch(console.error);
   });
 
   useIonViewWillLeave(() => {

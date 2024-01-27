@@ -33,35 +33,35 @@ const PlaylistEditor: React.FC = () => {
       videoId: ''
     });
 
+    const fetchDataInUseEffect = async () => {
+      let thePlaylist = await fetchPhlist();
+      if (thePlaylist) {
+        setPlayList(thePlaylist);
+      }
+      let theInterstitial = await fetchInterstitial();
+      if (theInterstitial) {
+        setInterstitial(theInterstitial);
+      }
+      opts.current = {
+        height: "390",
+        width: "640",
+        playerVars: {
+          // https://developers.google.com/youtube/player_parameters
+          autoplay: 0,
+          start: playList[currentId.current] ? playList[currentId.current].start : 0,
+          //end: playList[currentId.current].end,
+          controls: 0,
+          iv_load_policy: 3,
+          rel: 0,
+          mute: 0
+        },
+      };
+      setVideoId(playList[currentId.current] ? playList[currentId.current].videoId : 'AjWfY7SnMBI');
+    };
+
     useEffect(() => {
       if (!effectRan.current) {
         console.log("effect applied - only on the FIRST mount");
-      }
-
-      const fetchDataInUseEffect = async () => {
-        let thePlaylist = await fetchPhlist();
-        if (thePlaylist) {
-          setPlayList(thePlaylist);
-        }
-        let theInterstitial = await fetchInterstitial();
-        if (theInterstitial) {
-          setInterstitial(theInterstitial);
-        }
-        opts.current = {
-          height: "390",
-          width: "640",
-          playerVars: {
-            // https://developers.google.com/youtube/player_parameters
-            autoplay: 0,
-            start: playList[currentId.current] ? playList[currentId.current].start : 0,
-            //end: playList[currentId.current].end,
-            controls: 0,
-            iv_load_policy: 3,
-            rel: 0,
-            mute: 0
-          },
-        };
-        setVideoId(playList[currentId.current] ? playList[currentId.current].videoId : 'AjWfY7SnMBI');
       }
 
       fetchDataInUseEffect().catch(console.error);
@@ -84,6 +84,7 @@ const PlaylistEditor: React.FC = () => {
 
     useIonViewWillEnter(() => {
       console.log('ionViewWillEnter event fired');
+      fetchDataInUseEffect().catch(console.error);
     });
 
     useIonViewWillLeave(() => {
