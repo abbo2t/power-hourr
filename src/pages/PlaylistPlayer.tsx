@@ -4,7 +4,7 @@ import {
   IonHeader,
   IonPage,
   IonTitle,
-  IonToolbar,
+  IonToolbar, useIonViewDidEnter, useIonViewDidLeave, useIonViewWillEnter, useIonViewWillLeave,
 } from "@ionic/react";
 import YouTube, {YouTubeProps} from "react-youtube";
 import ExploreContainer from "../components/ExploreContainer";
@@ -63,6 +63,22 @@ const PlaylistPlayer: React.FC = () => {
       effectRan.current = true;
     };
   }, []);
+
+  useIonViewDidEnter(() => {
+    console.log('ionViewDidEnter event fired');
+  });
+
+  useIonViewDidLeave(() => {
+    console.log('ionViewDidLeave event fired');
+  });
+
+  useIonViewWillEnter(() => {
+    console.log('ionViewWillEnter event fired');
+  });
+
+  useIonViewWillLeave(() => {
+    console.log('ionViewWillLeave event fired');
+  });
 
   const onPlayerReady: YouTubeProps["onReady"] = (event) => {
     console.log("onPlayerReady is called!", event.target);

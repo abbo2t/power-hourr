@@ -4,7 +4,7 @@ import {
   IonHeader, IonInput, IonItem, IonLabel, IonList,
   IonPage, IonReorder, IonReorderGroup, IonRow,
   IonTitle,
-  IonToolbar, ItemReorderEventDetail,
+  IonToolbar, ItemReorderEventDetail, useIonViewDidEnter, useIonViewDidLeave, useIonViewWillEnter, useIonViewWillLeave,
 } from "@ionic/react";
 import YouTube, {YouTubeProps} from "react-youtube";
 import ExploreContainer from "../components/ExploreContainer";
@@ -52,6 +52,22 @@ const PlaylistLoader: React.FC = () => {
       effectRan.current = true;
     };
   }, []);
+
+  useIonViewDidEnter(() => {
+    console.log('ionViewDidEnter event fired');
+  });
+
+  useIonViewDidLeave(() => {
+    console.log('ionViewDidLeave event fired');
+  });
+
+  useIonViewWillEnter(() => {
+    console.log('ionViewWillEnter event fired');
+  });
+
+  useIonViewWillLeave(() => {
+    console.log('ionViewWillLeave event fired');
+  });
 
   const storeMyPlaylist = async (playlist: any) => {
     const store = new Storage();

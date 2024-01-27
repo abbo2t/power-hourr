@@ -6,7 +6,7 @@ import {
   IonTitle,
   IonToolbar,
   IonAccordion,
-  IonAccordionGroup, IonInput
+  IonAccordionGroup, IonInput, useIonViewDidEnter, useIonViewDidLeave, useIonViewWillEnter, useIonViewWillLeave
 } from "@ionic/react";
 import YouTube, {YouTubeProps} from "react-youtube";
 import ExploreContainer from "../components/ExploreContainer";
@@ -73,6 +73,23 @@ const PlaylistEditor: React.FC = () => {
       };
     }, []);
 
+
+    useIonViewDidEnter(() => {
+      console.log('ionViewDidEnter event fired');
+    });
+
+    useIonViewDidLeave(() => {
+      console.log('ionViewDidLeave event fired');
+    });
+
+    useIonViewWillEnter(() => {
+      console.log('ionViewWillEnter event fired');
+    });
+
+    useIonViewWillLeave(() => {
+      console.log('ionViewWillLeave event fired');
+    });
+
     const onPlayerReady: YouTubeProps["onReady"] = (event) => {
       // access to player in all event handlers via event.target
       console.log("onPlayerReady is called!", currentId.current, event.target);
@@ -126,7 +143,7 @@ const PlaylistEditor: React.FC = () => {
               <IonTitle size="large">Edit</IonTitle>
             </IonToolbar>
           </IonHeader>
-          <ExploreContainer name="Playlist Player Page">
+          <ExploreContainer name="Playlist Editor Page">
             <h2>Edit your playlist</h2>
             <IonGrid>
               <IonRow>

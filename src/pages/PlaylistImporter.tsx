@@ -5,7 +5,7 @@ import {
   IonPage, IonReorder, IonReorderGroup, IonRow,
   IonTextarea,
   IonTitle, IonToast,
-  IonToolbar, ItemReorderEventDetail,
+  IonToolbar, ItemReorderEventDetail, useIonViewDidEnter, useIonViewDidLeave, useIonViewWillEnter, useIonViewWillLeave,
 } from "@ionic/react";
 import YouTube, {YouTubeProps} from "react-youtube";
 import ExploreContainer from "../components/ExploreContainer";
@@ -70,6 +70,22 @@ const PlaylistImporter: React.FC = () => {
       effectRan.current = true;
     };
   }, []);
+
+  useIonViewDidEnter(() => {
+    console.log('ionViewDidEnter event fired');
+  });
+
+  useIonViewDidLeave(() => {
+    console.log('ionViewDidLeave event fired');
+  });
+
+  useIonViewWillEnter(() => {
+    console.log('ionViewWillEnter event fired');
+  });
+
+  useIonViewWillLeave(() => {
+    console.log('ionViewWillLeave event fired');
+  });
 
   const handleSaveButtonClick = () => {
     const adjustedFilename = filename.endsWith('.json') ? filename : `${filename}.json`;
@@ -155,7 +171,7 @@ const PlaylistImporter: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Export Playlist</IonTitle>
+          <IonTitle>Import Playlist</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
@@ -164,34 +180,7 @@ const PlaylistImporter: React.FC = () => {
             <IonTitle size="large">Import/Export</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <ExploreContainer name="Playlist Exporter Page">
-          <h2>Export Your Playlist</h2>
-          <IonGrid>
-            <IonRow>
-              <IonCol size="12" size-sm="8" offsetSm="2">
-                <IonList>
-                  <IonItem>
-                    <IonTextarea className="export-code" autoGrow={true} value={exportCode}></IonTextarea>
-                  </IonItem>
-                  <IonItem>
-                    <IonCheckbox checked={includeInterstitial} onClick={(e) => {
-                      setIncludeInterstitial(!includeInterstitial);
-                      formatPlaylistForExport(!includeInterstitial).catch(console.error);
-                    }}>Include interstitial?</IonCheckbox>
-                  </IonItem>
-                  <IonItem>
-                    <IonInput label="Filename" value={filename} onIonChange={(e) => {
-                      // @ts-ignore
-                      setFilename(e.target.value);
-                    }}></IonInput>
-                  </IonItem>
-                </IonList>
-                <IonButton onClick={() => {
-                  return handleSaveButtonClick();
-                }}>Export</IonButton>
-              </IonCol>
-            </IonRow>
-          </IonGrid>
+        <ExploreContainer name="Playlist Importer Page">
           <h2>Import Your Playlist</h2>
           <IonGrid>
             <IonRow>
@@ -222,7 +211,33 @@ const PlaylistImporter: React.FC = () => {
                   console.log('Playlist string:', playListString);
                   importPlaylist(playListString).catch(console.error);
                 }}>Import</IonButton>
-                <br/><br/><br/><br/>
+              </IonCol>
+            </IonRow>
+          </IonGrid>
+          <h2>Export Your Playlist</h2>
+          <IonGrid>
+            <IonRow>
+              <IonCol size="12" size-sm="8" offsetSm="2">
+                <IonList>
+                  <IonItem>
+                    <IonTextarea className="export-code" autoGrow={true} value={exportCode}></IonTextarea>
+                  </IonItem>
+                  <IonItem>
+                    <IonCheckbox checked={includeInterstitial} onClick={(e) => {
+                      setIncludeInterstitial(!includeInterstitial);
+                      formatPlaylistForExport(!includeInterstitial).catch(console.error);
+                    }}>Include interstitial?</IonCheckbox>
+                  </IonItem>
+                  <IonItem>
+                    <IonInput label="Filename" value={filename} onIonChange={(e) => {
+                      // @ts-ignore
+                      setFilename(e.target.value);
+                    }}></IonInput>
+                  </IonItem>
+                </IonList>
+                <IonButton onClick={() => {
+                  return handleSaveButtonClick();
+                }}>Export</IonButton>
               </IonCol>
             </IonRow>
           </IonGrid>

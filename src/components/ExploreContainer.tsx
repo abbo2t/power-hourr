@@ -12,6 +12,7 @@ const ExploreContainer: React.FC<ContainerProps> = ({name, children}) => {
       <div>
         {children}
       </div>
+      <br/><br/><br/><br/>
     </div>
   );
 };
