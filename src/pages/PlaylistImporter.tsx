@@ -1,12 +1,15 @@
 import {
   IonButton, IonCheckbox, IonCol,
   IonContent, IonGrid,
-  IonHeader, IonInput, IonItem, IonLabel, IonList,
+  IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList,
   IonPage, IonReorder, IonReorderGroup, IonRow,
   IonTextarea,
   IonTitle, IonToast,
   IonToolbar, ItemReorderEventDetail, useIonViewDidEnter, useIonViewDidLeave, useIonViewWillEnter, useIonViewWillLeave,
 } from "@ionic/react";
+import {
+  checkmarkOutline
+} from 'ionicons/icons';
 import YouTube, {YouTubeProps} from "react-youtube";
 import ExploreContainer from "../components/ExploreContainer";
 import "./PlaylistImporter.css";
@@ -27,6 +30,7 @@ const PlaylistImporter: React.FC = () => {
   const effectRan = useRef(false);
   const isDebouncing = useRef(false);
   const theCurrentId = useRef(0);
+  const inputRef = useRef(null);
   const [videoId, setVideoId] = useState('');
   const [listId, setListId] = useState('');
   const [myOptions, setMyOptions] = useState<YouTubeProps["opts"]>({
@@ -98,7 +102,7 @@ const PlaylistImporter: React.FC = () => {
   // @ts-ignore
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-
+    console.log('Current file input', e.target.files[0]);
     if (file) {
       // Read the content of the file
       const reader = new FileReader();
@@ -107,13 +111,15 @@ const PlaylistImporter: React.FC = () => {
         try {
           // Parse the JSON content of the file
           // @ts-ignore
-          //const jsonObject = JSON.parse(event.target.result);
+          const jsonObject = JSON.parse(event.target.result);
 
           // Use the parsed object in your application
-          //setUploadedFile(jsonObject);
+          // @ts-ignore
           setImportCode(event.target.result);
         } catch (error) {
           console.error('Error parsing JSON file:', error);
+          setToastMessage('JSON format error.');
+          setIsToastOpen(true);
         }
       };
 
@@ -186,19 +192,21 @@ const PlaylistImporter: React.FC = () => {
           <IonGrid>
             <IonRow>
               <IonCol size="12" size-sm="8" offsetSm="2">
-                <IonList>
+                {/*<IonList>
                   <IonItem>
-                    <IonTextarea
+                    {<IonTextarea
                       className="import-code"
                       autoGrow={true}
                       value={importCode}
                       onBlur={(e) => {
                         // @ts-ignore
                         setImportCode(e.target.value);
-                      }}></IonTextarea>
+                      }}></IonTextarea>}
                   </IonItem>
-                </IonList>
-                <input type="file" accept=".json" onChange={handleFileChange}/>
+                </IonList>*/}
+                <input id="playlist-upload" className="hidden" ref={inputRef} type="file" accept=".json" onChange={handleFileChange}/>
+                { /* @ts-ignore */ }
+                <IonButton onClick={()=>{inputRef.current.click()}}>{importCode && <IonIcon aria-hidden="true" icon={checkmarkOutline} />}Upload</IonButton>
                 <IonButton onClick={(e) => {
                   let playListString = '';
                   try {
@@ -220,9 +228,9 @@ const PlaylistImporter: React.FC = () => {
             <IonRow>
               <IonCol size="12" size-sm="8" offsetSm="2">
                 <IonList>
-                  <IonItem>
+                  {/*<IonItem>
                     <IonTextarea className="export-code" autoGrow={true} value={exportCode}></IonTextarea>
-                  </IonItem>
+                  </IonItem>*/}
                   <IonItem>
                     <IonCheckbox checked={includeInterstitial} onClick={(e) => {
                       setIncludeInterstitial(!includeInterstitial);

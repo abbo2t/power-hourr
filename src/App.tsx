@@ -18,7 +18,7 @@ import {
   playCircleOutline,
   reloadOutline, downloadOutline
 } from 'ionicons/icons';
-import Tab1 from './pages/Tab1';
+import Home from './pages/Home';
 import Tab2 from './pages/Tab2';
 import Tab3 from './pages/Tab3';
 import PlaylistLoader from './pages/PlaylistLoader';
@@ -53,8 +53,8 @@ const App: React.FC = () => (
     <IonReactRouter basename={typeof window !== 'undefined' && window.location.pathname.startsWith('/power-hourr') ? '/power-hourr' : ''}>
       <IonTabs>
         <IonRouterOutlet>
-          <Route exact path="/tab1">
-            <Tab1 />
+          <Route exact path="/home">
+            <Home />
           </Route>
           <Route exact path="/tab2">
             <Tab2 />
@@ -75,7 +75,7 @@ const App: React.FC = () => (
             <PlaylistImporter />
           </Route>
           <Route exact path="/">
-            <Redirect to="/tab1" />
+            <Redirect to="/home" />
           </Route>
         </IonRouterOutlet>
         <IonTabBar slot="bottom">

@@ -235,6 +235,8 @@ const PlaylistEditor: React.FC = () => {
                               // update YouTube playhead
                               // @ts-ignore
                               if (currentRange.current.lower !== detail.value.lower) {
+                                // @ts-ignore
+                                console.info(`%c⬇️changing lower value from  ${currentRange.current.lower} to ${detail.value.lower}`, 'color: white;background-color: green');
                                 opts.current = {
                                   ...opts,
                                   playerVars: {
@@ -256,6 +258,8 @@ const PlaylistEditor: React.FC = () => {
                                 currentRange.current.lower = detail.value.lower;
                                 // @ts-ignore
                               } else if (currentRange.current.upper !== detail.value.upper) {
+                                // @ts-ignore
+                                console.info(`%c⬆️changing upper value from  ${currentRange.current.upper} to ${detail.value.upper}`,'background-color: green; color: white');
                                 opts.current = {
                                   ...opts,
                                   playerVars: {
@@ -367,8 +371,6 @@ const PlaylistEditor: React.FC = () => {
                       </IonRange>
                     )
                     }</div>
-                  <p>Copyright</p>
-                  <p>&copy; 2024</p>
                 </IonCol>
               </IonRow>
             </IonGrid>

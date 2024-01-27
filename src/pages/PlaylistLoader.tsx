@@ -3,7 +3,7 @@ import {
   IonContent, IonGrid,
   IonHeader, IonInput, IonItem, IonLabel, IonList,
   IonPage, IonReorder, IonReorderGroup, IonRow,
-  IonTitle,
+  IonTitle, IonToast,
   IonToolbar, ItemReorderEventDetail, useIonViewDidEnter, useIonViewDidLeave, useIonViewWillEnter, useIonViewWillLeave,
 } from "@ionic/react";
 import YouTube, {YouTubeProps} from "react-youtube";
@@ -19,6 +19,8 @@ const PlaylistLoader: React.FC = () => {
   const theCurrentId = useRef(0);
   const [videoId, setVideoId] = useState('');
   const [listId, setListId] = useState('');
+  const [isToastOpen, setIsToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
   const [myOptions, setMyOptions] = useState<YouTubeProps["opts"]>({
     height: "195",
     width: "320",
@@ -103,6 +105,8 @@ const PlaylistLoader: React.FC = () => {
       const myPlaylist = event.target.getPlaylist();
       console.log('got playlist', myPlaylist, event.target);
       await storeMyPlaylist(myPlaylist);
+      setToastMessage(`Loaded ${myPlaylist.length} videos.`);
+      setIsToastOpen(true);
     }
   };
 
@@ -124,7 +128,7 @@ const PlaylistLoader: React.FC = () => {
           <IonGrid>
             <IonRow>
               <IonCol size="12" size-sm="8" offsetSm="2">
-                <div>
+                <div className={"hidden"}>
                   <YouTube
                     opts={myOptions}
                     onReady={onMyPlayerReady}
@@ -132,10 +136,19 @@ const PlaylistLoader: React.FC = () => {
                 </div>
                 <IonList>
                   <IonItem>
-                    <IonInput label="Playlist ID" placeholder="Enter playlist ID" value={listId}
-                              onIonInput={(ev: Event) => {
+                    <IonInput label="Playlist URL" placeholder="Enter playlist URL" value={(() => {
+                      return `https://www.youtube.com/watch?v=L_XJ_s5IsQc&list=${listId}`;
+                    })()}
+                              onIonBlur={(ev: Event) => {
                                 const value = (ev.target as HTMLIonInputElement).value as string;
-                                setListId(value);
+                                let regExp = /^.*(youtu.be\/|list=)([^#\&\?]*).*/;
+                                let match = value.match(regExp);
+                                if (match && match[2]) {
+                                  setListId(match[2]);
+                                } else {
+                                  setToastMessage('Inavlid Playlist URL.');
+                                  setIsToastOpen(true);
+                                }
                               }}></IonInput>
                   </IonItem>
                 </IonList>
@@ -148,14 +161,19 @@ const PlaylistLoader: React.FC = () => {
                       'list': listId
                     },
                   };
-                  ;
                   setMyOptions(updatedOptions);
                   storePlaylistInfo({'id': listId}).catch(console.error);
                   console.log(myOptions);
-                  //opts.current = {...opts.current, controls: '0'}
-                  //setVideoId(playList[currentId.current].videoId);
                 }}>Load</IonButton>
               </IonCol>
+              <IonToast
+                isOpen={isToastOpen}
+                message={toastMessage}
+                position="top"
+                positionAnchor="header"
+                onDidDismiss={() => setIsToastOpen(false)}
+                duration={5000}
+              ></IonToast>
             </IonRow>
           </IonGrid>
         </ExploreContainer>

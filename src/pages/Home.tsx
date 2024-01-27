@@ -11,11 +11,23 @@ import {
   IonCardContent
 } from "@ionic/react";
 import ExploreContainer from "../components/ExploreContainer";
-import "./Tab1.css";
+import "./Home.css";
+import {useEffect, useState} from "react";
+import {fetchPhlist} from "../utilities";
 
-const Tab1: React.FC = () => {
-  let playlist: string | any[] = [];
-  let editing = playlist && playlist.length;
+const Home: React.FC = () => {
+  const [playList, setPlayList] = useState<any[]>([]);
+  const fetchDataInUseEffect = async () => {
+    let thePlaylist = await fetchPhlist();
+    if (thePlaylist) {
+      setPlayList(thePlaylist);
+    }
+  };
+
+  useEffect(() => {
+    fetchDataInUseEffect().catch(console.error);
+  }, []);
+
   return (
     <IonPage>
       <IonHeader>
@@ -31,10 +43,10 @@ const Tab1: React.FC = () => {
         </IonHeader>
         <ExploreContainer name="Power Hourr">
 
-          <IonCard routerLink={editing ? '/editor/1' : '/loader/1'}>
+          <IonCard routerLink={playList.length ? '/editor/1' : '/loader/1'}>
             <IonCardHeader>
-              <IonCardTitle>{editing ? 'Edit' : 'Create'} Your Playlist</IonCardTitle>
-              <IonCardSubtitle>{editing ? playlist.length + ' Videos': 'New'}</IonCardSubtitle>
+              <IonCardTitle>{playList.length ? 'Edit' : 'Create'} Your Playlist</IonCardTitle>
+              <IonCardSubtitle>{playList.length ? playList.length + ' Videos': 'New'}</IonCardSubtitle>
             </IonCardHeader>
 
             <IonCardContent>
@@ -48,4 +60,4 @@ const Tab1: React.FC = () => {
   );
 };
 
-export default Tab1;
+export default Home;
