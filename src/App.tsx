@@ -9,7 +9,7 @@ import {
   IonTabs,
   setupIonicReact
 } from '@ionic/react';
-import { IonReactRouter } from '@ionic/react-router';
+import { IonReactHashRouter } from '@ionic/react-router';
 import {
   listOutline,
   libraryOutline,
@@ -50,7 +50,7 @@ setupIonicReact();
 
 const App: React.FC = () => (
   <IonApp>
-    <IonReactRouter basename={typeof window !== 'undefined' && window.location.pathname.startsWith('/power-hourr') ? '/power-hourr' : ''}>
+    <IonReactHashRouter basename={typeof window !== 'undefined' && window.location.pathname.startsWith('/power-hourr') ? '/power-hourr' : ''}>
       <IonTabs>
         <IonRouterOutlet>
           <Route exact path="/home">
@@ -97,7 +97,7 @@ const App: React.FC = () => (
           </IonTabButton>
         </IonTabBar>
       </IonTabs>
-    </IonReactRouter>
+    </IonReactHashRouter>
   </IonApp>
 );
 
