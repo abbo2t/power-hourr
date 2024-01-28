@@ -77,6 +77,10 @@ const PlaylistLoader: React.FC = () => {
     await store.create();
 
     const fetchedPlayList = await fetchPhlist();
+    if (typeof fetchedPlayList === 'undefined' || null === fetchedPlayList) {
+      await storePhlist(playlist);
+      return;
+    }
 
     // @ts-ignore
     const updatedPlayList = playlist.map((item, index) => {
