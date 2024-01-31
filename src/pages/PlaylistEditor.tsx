@@ -18,7 +18,7 @@ const PlaylistEditor: React.FC = () => {
     const effectRan = useRef(false);
     const currentId = useRef(0);
     const currentLength = useRef(100);
-    const currentRange = useRef({lower: 0, upper: 0});
+    const currentRange = useRef({lower: 1, upper: 1});
     const accordionGroup = useRef<null | HTMLIonAccordionGroupElement>(null);
     const [playList, setPlayList] = useState<any[]>([]);
     //const [opts, setOpts] = useState({});
@@ -32,6 +32,11 @@ const PlaylistEditor: React.FC = () => {
       title: '',
       videoId: ''
     });
+
+    const debugRange = () => {
+      console.log(`%c Current Range {lower: ${currentRange.current.lower}, upper: ${currentRange.current.upper}}`,
+        'background-color:darkgreen; color: white');
+    };
 
     const fetchDataInUseEffect = async () => {
       let thePlaylist = await fetchPhlist();
@@ -157,6 +162,8 @@ const PlaylistEditor: React.FC = () => {
                       <div slot="content">
                         {playList.map((d: any, ix) => (
                           <IonItem button key={d.videoId} onClick={() => {
+                            currentRange.current.lower = 1;
+                            currentRange.current.upper = 1;
                             currentId.current = ix;
                             currentLength.current = getLengthOfVideo(d);
                             opts.current = {
@@ -182,6 +189,8 @@ const PlaylistEditor: React.FC = () => {
                       <div slot="content">
                         <IonItem button key={'interstitial'} onClick={() => {
                           //currentId.current = ix;
+                          currentRange.current.lower = 1;
+                          currentRange.current.upper = 1;
                           currentLength.current = getLengthOfVideo(interstitial);
                           opts.current = {
                             ...opts,
