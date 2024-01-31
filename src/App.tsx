@@ -16,7 +16,7 @@ import {
   personOutline,
   createOutline,
   playCircleOutline,
-  reloadOutline, downloadOutline
+  reloadOutline, downloadOutline, homeOutline
 } from 'ionicons/icons';
 import Home from './pages/Home';
 import Tab2 from './pages/Tab2';
@@ -56,12 +56,6 @@ const App: React.FC = () => (
           <Route exact path="/home">
             <Home />
           </Route>
-          <Route exact path="/tab2">
-            <Tab2 />
-          </Route>
-          <Route path="/tab3">
-            <Tab3 />
-          </Route>
           <Route path="/play/:id">
             <PlaylistPlayer />
           </Route>
@@ -79,6 +73,10 @@ const App: React.FC = () => (
           </Route>
         </IonRouterOutlet>
         <IonTabBar slot="bottom">
+          <IonTabButton tab="tab0" href="/home">
+            <IonIcon aria-hidden="true" icon={homeOutline} />
+            <IonLabel>Home</IonLabel>
+          </IonTabButton>
           <IonTabButton tab="tab1" href="/editor/1">
             <IonIcon aria-hidden="true" icon={createOutline} />
             <IonLabel>Edit</IonLabel>
