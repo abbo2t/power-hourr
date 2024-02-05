@@ -60,7 +60,7 @@ const PlaylistImporter: React.FC = () => {
       setListId(thePlaylistInfo.id);
     }
     const fetchedPlayList = await fetchPhlist();
-    setExportCode(JSON.stringify(fetchedPlayList ? fetchedPlayList : []));
+    setExportCode(JSON.stringify(fetchedPlayList || []));
   };
 
   useEffect(() => {
