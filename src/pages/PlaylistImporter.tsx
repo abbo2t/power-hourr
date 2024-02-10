@@ -50,7 +50,7 @@ const PlaylistImporter: React.FC = () => {
   const [importCode, setImportCode] = useState("");
   const [exportCode, setExportCode] = useState("");
   const [includeInterstitial, setIncludeInterstitial] = useState(false);
-  const [filename, setFilename] = useState("playlist");
+  const [filename, setFilename] = useState("playlist.json");
   const [isToastOpen, setIsToastOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
 
@@ -152,11 +152,12 @@ const PlaylistImporter: React.FC = () => {
       .map((e: any, i: any, final: string | any[]) => final.indexOf(e) !== i && i)
       .filter((obj: string | number) => playlist[obj])
       .map((e: string | number) => playlist[e])
+    let filteredArr = [];
 
     console.log('Duplicates:', duplicates);
     if (duplicates.length) {
       // Remove all instances of duplicate video
-      const filteredArr = playlist.filter((obj: { videoId: any; }) => obj.videoId !== duplicates[0].videoId);
+      filteredArr = playlist.filter((obj: { videoId: any; }) => obj.videoId !== duplicates[0].videoId);
       // Store de-interstitialized playlist as phlist
       await storePhlist(filteredArr);
       // Store interstitial
@@ -170,7 +171,7 @@ const PlaylistImporter: React.FC = () => {
     } else {
       await storePhlist(playlist);
     }
-    setToastMessage('Import Successful!')
+    setToastMessage(`Imported ${filteredArr.length ? filteredArr.length : playlist.length} videos!`);
     setIsToastOpen(true);
   };
 
@@ -178,7 +179,7 @@ const PlaylistImporter: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Import Playlist</IonTitle>
+          <IonTitle>Import/Export Playlist</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
@@ -187,11 +188,11 @@ const PlaylistImporter: React.FC = () => {
             <IonTitle size="large">Import/Export</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <ExploreContainer name="Playlist Importer Page">
-          <h2>Import Your Playlist</h2>
+        <ExploreContainer name="Playlist Import/Export Page">
           <IonGrid>
             <IonRow>
-              <IonCol size="12" size-sm="8" offsetSm="2">
+              <IonCol size="12" size-sm="6" >
+                <h2>Import Playlist</h2>
                 {/*<IonList>
                   <IonItem>
                     {<IonTextarea
@@ -204,6 +205,7 @@ const PlaylistImporter: React.FC = () => {
                       }}></IonTextarea>}
                   </IonItem>
                 </IonList>*/}
+
                 <input id="playlist-upload" className="hidden" ref={inputRef} type="file" accept=".json" onChange={handleFileChange}/>
                 { /* @ts-ignore */ }
                 <IonButton onClick={()=>{inputRef.current.click()}}>{importCode && <IonIcon aria-hidden="true" icon={checkmarkOutline} />}Upload</IonButton>
@@ -221,12 +223,8 @@ const PlaylistImporter: React.FC = () => {
                   importPlaylist(playListString).catch(console.error);
                 }}>Import</IonButton>
               </IonCol>
-            </IonRow>
-          </IonGrid>
-          <h2>Export Your Playlist</h2>
-          <IonGrid>
-            <IonRow>
-              <IonCol size="12" size-sm="8" offsetSm="2">
+              <IonCol size="12" size-sm="6" >
+                <h2>Export Playlist</h2>
                 <IonList>
                   {/*<IonItem>
                     <IonTextarea className="export-code" autoGrow={true} value={exportCode}></IonTextarea>
